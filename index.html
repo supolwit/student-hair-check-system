@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ระบบตรวจผมนักเรียน</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="center">
+    <h1>ระบบตรวจผมนักเรียน</h1>
+    <div class="card">
+      <label>รหัสผู้ใช้</label>
+      <input id="userid" placeholder="user id" />
+      <label>รหัสผ่าน</label>
+      <input id="password" type="password" placeholder="password" />
+      <label>บทบาท</label>
+      <select id="role">
+        <option value="student">นักเรียน</option>
+        <option value="teacher">ครู</option>
+      </select>
+      <button id="loginBtn">เข้าสู่ระบบ</button>
+    </div>
+    <p class="muted">ทดลองใช้: teacher1 / pass (role: teacher)</p>
+  </main>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

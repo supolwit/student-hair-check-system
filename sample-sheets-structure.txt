@@ -1,0 +1,17 @@
+Google Sheet structure (recommended):
+
+Sheet name: Students
+Header row (A1..): studentId, name, grade
+
+Sheet name: Users
+Header row (A1..): userid, password, role
+- Example: teacher1, yourpassword, teacher
+
+Sheet name: Inspections
+Header row: studentId, name, grade, date, result, teacher, note, recordId
+
+Sheet name: Calendar
+Header row: month, year, activity, level, date, owner, place, note, eventId
+
+Sheet name: Records
+(optional) can be same as Inspections for history

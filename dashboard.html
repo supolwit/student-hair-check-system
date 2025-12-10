@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>แดชบอร์ดครู - ตรวจผม</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ระบบตรวจผมนักเรียน</div>
+    <div>
+      <button id="logoutBtn">ออกจากระบบ</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="panel">
+      <h2>ฟอร์มเพิ่มกิจกรรมปฏิทิน</h2>
+      <div class="grid">
+        <input id="cal_month" placeholder="MM" />
+        <input id="cal_year" placeholder="YYYY" />
+        <input id="cal_activity" placeholder="ชื่อกิจกรรม" />
+        <input id="cal_level" placeholder="ระดับชั้น (ม.1 หรือ ม.ต้น)" />
+        <input id="cal_date" type="date" />
+        <input id="cal_owner" placeholder="ผู้รับผิดชอบ" />
+        <input id="cal_place" placeholder="เวลา/สถานที่" />
+        <input id="cal_note" placeholder="หมายเหตุ" />
+      </div>
+      <div style="margin-top:8px">
+        <button id="addCalBtn">เพิ่มกิจกรรม</button>
+        <button id="exportPdfBtn">ดาวน์โหลดปฏิทิน (PDF)</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>บันทึกการตรวจ (ค้นหาโดยรหัส)</h2>
+      <div class="grid">
+        <input id="ins_studentId" placeholder="รหัสนักเรียน (ตัวอย่าง: 61001)" />
+        <input id="ins_name" placeholder="ชื่อ" />
+        <input id="ins_grade" placeholder="ชั้น (ม.1)" />
+        <input id="ins_date" type="datetime-local" />
+        <select id="ins_result"><option>ผ่าน</option><option>ไม่ผ่าน</option></select>
+        <input id="ins_teacher" placeholder="ผู้ตรวจ" />
+        <input id="ins_note" placeholder="หมายเหตุ" />
+      </div>
+      <div style="margin-top:8px">
+        <button id="addInsBtn">บันทึกการตรวจ</button>
+      </div>
+
+      <h3 style="margin-top:16px">ประวัติการตรวจ (ล่าสุด)</h3>
+      <div id="recentList"></div>
+    </section>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // Basic interactivity for dashboard
+    document.getElementById('logoutBtn').addEventListener('click', ()=>location.href='index.html');
+
+    document.getElementById('addCalBtn').addEventListener('click', async ()=>{
+      const payload = {
+        month: document.getElementById('cal_month').value,
+        year: document.getElementById('cal_year').value,
+        activity: document.getElementById('cal_activity').value,
+        level: document.getElementById('cal_level').value,
+        date: document.getElementById('cal_date').value,
+        owner: document.getElementById('cal_owner').value,
+        place: document.getElementById('cal_place').value,
+        note: document.getElementById('cal_note').value
+      };
+      const r = await apiAddCalendar(payload);
+      alert(JSON.stringify(r));
+    });
+
+    document.getElementById('exportPdfBtn').addEventListener('click', async ()=>{
+      const month = document.getElementById('cal_month').value;
+      const year = document.getElementById('cal_year').value;
+      const r = await apiExportCalendar(month, year);
+      if (r && r.base64) {
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + r.base64;
+        link.download = r.filename || `calendar_${year}_${month}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        alert('ไม่สามารถสร้าง PDF ได้');
+      }
+    });
+
+    document.getElementById('addInsBtn').addEventListener('click', async ()=>{
+      const payload = {
+        studentId: document.getElementById('ins_studentId').value,
+        name: document.getElementById('ins_name').value,
+        grade: document.getElementById('ins_grade').value,
+        date: document.getElementById('ins_date').value || new Date().toISOString(),
+        result: document.getElementById('ins_result').value,
+        teacher: document.getElementById('ins_teacher').value,
+        note: document.getElementById('ins_note').value
+      };
+      const r = await apiAddInspection(payload);
+      alert(JSON.stringify(r));
+      loadRecent();
+    });
+
+    async function loadRecent(){
+      const list = await apiFetchInspections();
+      const html = list.slice(0,20).map(it=>`<div class="row">${it.date} | ${it.studentId} | ${it.name} | ${it.grade} | ${it.result} | ${it.teacher}</div>`).join('');
+      document.getElementById('recentList').innerHTML = html;
+    }
+    loadRecent();
+  </script>
+</body>
+</html>

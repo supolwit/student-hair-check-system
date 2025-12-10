@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ประวัติการตรวจ - นักเรียน</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ระบบตรวจผมนักเรียน</div>
+    <div>
+      <button onclick="location.href='index.html'">ออก</button>
+    </div>
+  </header>
+
+  <main class="center">
+    <h2>ประวัติตรวจผมของฉัน</h2>
+    <div>
+      <label>รหัสนักเรียน</label>
+      <input id="stu_id" placeholder="กรอกรหัส (ตัวอย่าง 61001)" />
+      <button id="btnLoad">โหลดประวัติ</button>
+    </div>
+    <div id="historyList" style="margin-top:12px"></div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('btnLoad').addEventListener('click', async ()=>{
+      const id = document.getElementById('stu_id').value;
+      const list = await apiFetchHistory(id);
+      if (!list) {
+        document.getElementById('historyList').innerText = 'ไม่มีข้อมูล';
+        return;
+      }
+      document.getElementById('historyList').innerHTML = list.map(r=>`<div class="row">${r.date} | ${r.result} | ${r.teacher} | ${r.note||''}</div>`).join('');
+    });
+  </script>
+</body>
+</html>
